@@ -1,53 +1,50 @@
 # cpp-thread-pool
 
-Modern, standards-forward C++ task scheduler built around a lightweight thread pool, a blocking queue, and an extensible stop token system. The project is intended to demonstrate how to orchestrate async work without overloading the system with one thread per task while keeping the public API simple and safe.
+Simple, fast, and predictable C++20 thread-pool scheduler with clear shutdown semantics and a minimal public API.
 
-## Overview
+## Why It Matters
+- Replace thread-per-task with a fixed worker pool to reduce overhead and keep CPU usage stable.
+- Provide a clean submission API and a safe shutdown story for production-grade async work.
+- Offer a focused, modern C++20 example that is easy to read, extend, and benchmark.
 
-`cpp-thread-pool` is designed to offer a predictable task execution engine that:
+## At a Glance
+- Predictable concurrency model with a fixed worker pool and clear shutdown path.
+- Minimal C++20 API focused on safety, maintainability, and blocking-queue semantics.
+- Roadmap-driven implementation with tests/benchmarks scaffolded for validation.
 
-- keeps a fixed set of worker threads that pull work from a shared queue;
-- exposes a minimal future-like interface so callers can enqueue jobs and observe completion;
-- exposes controls for graceful shutdown via a dedicated stop token and a queue that can be closed;
-- separates public headers (`include/tp/`) from implementation details in `src/`, making it simple to swap or extend components.
+## Project Status
+- Current phase: M0 (Public API + Contracts).
+- Public headers live in `include/tp/` with API contracts being finalized.
+- Core implementation and examples are in progress.
+- See `ROADMAP.md`, `TASKS.md`, and `plan.md` for the active timeline.
 
-The project roadmap (see `plan.md`) focuses on refining the public API first, building the core scheduler, then adding work-stealing, task lifetime management, and benchmarks/tests.
+## Planned Usage (Draft API)
+The API below is a target shape and may change while M0 is finalized.
 
-## Key Concepts
+```cpp
+#include <tp/thread_pool.hpp>
 
-- **BlockingQueue&lt;T&gt;** — a multi-producer, multi-consumer queue with blocking and non-blocking pop operations plus a `close()` that wakes waiting workers. Intended to be the central hand-off point between producers and worker threads.
-- **Stop token** — a lightweight flag that workers can observe to exit cleanly instead of forcefully terminating threads.
-- **Thread pool** — owns a fixed number of worker threads, accepts incoming tasks, and keeps them alive until all work is drained and the pool is shut down.
-- **Benchmarks/tests** — skeletal drivers under `bench/` and `tests/` that will be fleshed out as the implementation matures.
+int main() {
+    tp::thread_pool pool(4);
+
+    pool.enqueue_detach([](int v) { /* work */ }, 42);
+
+    auto fut = pool.enqueue([](int v) { return v * 2; }, 21);
+    auto value = fut.get();
+
+    pool.wait_for_tasks();
+}
+```
 
 ## Repository Layout
+- `include/tp/` — public headers (API contracts and types).
+- `src/` — implementation (worker loop, queue integration, shutdown).
+- `tests/` — unit/integration tests (scaffolded).
+- `bench/` — benchmark drivers (scaffolded).
+- `examples/` — usage examples (in progress).
 
-- `include/tp/` — public headers for the thread pool, queue, stop token, and project configuration.
-- `src/` — implementation files that tie the interface pieces together.
-- `tests/` — placeholders for unit/integration tests covering task execution, futures, shutdown semantics, and stress testing.
-- `bench/` — scaffolding for latency and throughput benchmarks that compare the scheduler against naive threading strategies.
-- `plan.md` — living plan that tracks the current phase (interface design, implementation, benchmarks, etc.).
-- `AGENTS.md` — agent instructions for collaborators (currently minimal, but intended to note stronger coordination details once the project grows).
+## Building (Scaffold)
+The CMake setup is currently a placeholder and will be finalized alongside the core implementation. Build guidance will be updated in M1.
 
-## Building
-
-1. Create a build directory: `cmake -S . -B build`.
-2. Configure and generate: `cmake --build build`.
-3. Run tests once implemented: `ctest --test-dir build`.
-
-The `CMakeLists.txt` file is the build entry point; it currently sets up the structure to wire the headers, sources, tests, and benchmarks into a coherent build.
-
-## Testing & Benchmarks
-
-- Tests live under `tests/` (basic, future behavior, shutdown semantics, and stress suites) and can be run via `ctest` once the implementations and CMake targets are complete.
-- Benchmarks (`bench_latency.cpp`, `bench_throughput.cpp`) will eventually exercise task latency and throughput against common scheduling patterns.
-
-## Contribution & Roadmap
-
-The next steps are documented in `plan.md` and focus on:
-
-1. Finalizing the public interfaces (`include/tp/*`) so callers understand how to enqueue tasks and query their results.
-2. Implementing the worker loop, task dispatch, and shutdown coordination in `src/`.
-3. Adding concrete tests and benchmarks to demonstrate behavior and performance.
-
-Contributions should respect this structure so future expansions (e.g., work stealing, profiling helpers, documentation) stay localized to clearly defined directories.
+## Roadmap
+High-level milestones and timelines live in `ROADMAP.md`, with detailed, prioritized tasks in `TASKS.md`.
