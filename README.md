@@ -1,5 +1,19 @@
 # cpp-thread-pool
 
+## BlockingQueue guarantees
+
+- `push(T)` returns `true` while the queue is open and enqueues the value (moves it when possible); after `close()` it returns `false` and silently drops new items.
+- `pop()` blocks until the queue has an item or `close()` is called. If closed and empty, it returns `std::nullopt`. Once an item is available, it moves it out and returns it.
+- `try_pop()` never blocks: it returns the front item if available, otherwise `std::nullopt`, so it can be used in polling loops.
+- `close()` sets the shutdown flag and calls `notify_all()` so every waiting `pop()` wakes, re-checks the predicate, and exits once the queue is drained.
+
+### Close/pop wake rules
+
+- `close()` runs under the mutex, flips `closed_`, and calls `cv_.notify_all()`, so every blocked `pop()` wakes exactly once with a consistent state view.
+- A woken `pop()` checks `queue_.empty()`; if the queue drained because the pool shut down, it returns `std::nullopt`, otherwise it moves the front element.
+- `push()` drops values once `closed_` is visible, so there are no surprises after shutdown starts.
+- `try_pop()` and the query helpers `empty()`/`size()` also lock the mutex, so they can safely observe the queue during close without races.
+
 Simple, fast, and predictable C++20 thread-pool scheduler with clear shutdown semantics and a minimal public API.
 
 ## Why It Matters

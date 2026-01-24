@@ -2,11 +2,11 @@
 
 Use this as the source of truth for per-milestone work. Check items as they land.
 
-## M0: Public API + Contracts
-- [ ] [P0] Define `BlockingQueue<T>` public API in `include/tp/blocking_queue.hpp`.
-- [ ] [P0] Document close/pop wake rules and blocking behavior.
-- [ ] [P0] Define `StopToken` + `StopSource` public API in `include/tp/stop_token.hpp`.
-- [ ] [P0] Define `ThreadPool` public API in `include/tp/thread_pool.hpp`.
+-## M0: Public API + Contracts
+- [x] [P0] Define `BlockingQueue<T>` public API in `include/tp/blocking_queue.hpp`.
+- [x] [P0] Document close/pop wake rules and blocking behavior.
+- [x] [P0] Define `StopToken` + `StopSource` public API in `include/tp/stop_token.hpp`.
+- [x] [P0] Define `ThreadPool` public API in `include/tp/thread_pool.hpp`.
 - [ ] [P1] Define future/promise surface for task submission (if needed).
 - [ ] [P1] Add minimal examples showing submit + shutdown flow in `examples/`.
 
