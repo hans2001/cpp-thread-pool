@@ -47,4 +47,4 @@ private:
     std::unique_ptr<Impl> impl_;
 };
 
-} 
+}  // namespace tp
