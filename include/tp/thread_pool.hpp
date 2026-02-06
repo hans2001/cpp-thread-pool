@@ -1,11 +1,15 @@
 #pragma once
 
+#include <atomic>
+#include <cstdint>
+#include <functional>
 #include <future>
 #include <memory>
 #include <optional>
 #include <thread>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "tp/blocking_queue.hpp"
 #include "tp/stop_token.hpp"
@@ -17,6 +21,14 @@ namespace tp {
 /// from a shared `BlockingQueue` and honor the `StopToken`/`StopSource`.
 class ThreadPool {
 public:
+    struct Stats {
+        uint64_t submitted = 0;
+        uint64_t completed = 0;
+        uint64_t rejected = 0;
+        uint64_t queued = 0;
+        uint64_t workers = 0;
+    };
+
     explicit ThreadPool(size_t worker_count = std::thread::hardware_concurrency());
 
     ThreadPool(const ThreadPool&) = delete;
@@ -40,11 +52,52 @@ public:
     /// Share a stop token with tasks/helpers so they can react to shutdown.
     StopToken get_stop_token() const noexcept;
 
+    /// Snapshot basic telemetry counters.
+    Stats stats() const noexcept;
+
     ~ThreadPool();
 
 private:
-    struct Impl;
+    struct Impl {
+        explicit Impl(size_t worker_count);
+
+        BlockingQueue<std::function<void()>> queue;
+        StopSource stop_source;
+        std::atomic<bool> shutdown{false};
+        std::atomic<uint64_t> submitted{0};
+        std::atomic<uint64_t> completed{0};
+        std::atomic<uint64_t> rejected{0};
+        std::vector<std::thread> workers;
+    };
     std::unique_ptr<Impl> impl_;
 };
+
+template <typename Callable, typename... Args>
+auto ThreadPool::submit(Callable&& callable, Args&&... args)
+    -> std::optional<std::future<std::invoke_result_t<Callable, Args...>>> {
+    using Result = std::invoke_result_t<Callable, Args...>;
+    if (!impl_ || impl_->shutdown.load(std::memory_order_acquire)) {
+        if (impl_) {
+            impl_->rejected.fetch_add(1, std::memory_order_relaxed);
+        }
+        return std::nullopt;
+    }
+
+    auto task_ptr = std::make_shared<std::packaged_task<Result()>>(
+        std::bind(std::forward<Callable>(callable), std::forward<Args>(args)...));
+    auto future = task_ptr->get_future();
+
+    auto accepted = impl_->queue.push([task_ptr, impl = impl_.get()]() {
+        (*task_ptr)();
+        impl->completed.fetch_add(1, std::memory_order_relaxed);
+    });
+    if (!accepted) {
+        impl_->rejected.fetch_add(1, std::memory_order_relaxed);
+        return std::nullopt;
+    }
+
+    impl_->submitted.fetch_add(1, std::memory_order_relaxed);
+    return future;
+}
 
 }  // namespace tp

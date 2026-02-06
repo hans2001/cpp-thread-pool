@@ -24,41 +24,67 @@ Simple, fast, and predictable C++20 thread-pool scheduler with clear shutdown se
 ## At a Glance
 - Predictable concurrency model with a fixed worker pool and clear shutdown path.
 - Minimal C++20 API focused on safety, maintainability, and blocking-queue semantics.
-- Roadmap-driven implementation with tests/benchmarks scaffolded for validation.
+- Benchmarks and examples included to validate throughput/latency and usage patterns.
 
 ## Project Status
-- Current phase: M0 (Public API + Contracts).
-- Public headers live in `include/tp/` with API contracts being finalized.
-- Core implementation and examples are in progress.
-- See `ROADMAP.md`, `TASKS.md`, and `plan.md` for the active timeline.
+- Current phase: M1 (Core Scheduler).
+- Core implementation, tests, examples, and benchmarks are available.
+- See `ROADMAP.md` and `TASKS.md` for the active timeline.
 
-## Planned Usage (Draft API)
-The API below is a target shape and may change while M0 is finalized.
+## Usage
+Basic usage with futures:
 
 ```cpp
-#include <tp/thread_pool.hpp>
+#include "tp/thread_pool.hpp"
 
 int main() {
-    tp::thread_pool pool(4);
+    tp::ThreadPool pool(4);
 
-    pool.enqueue_detach([](int v) { /* work */ }, 42);
+    auto fut = pool.submit([](int v) { return v * 2; }, 21);
+    if (fut.has_value()) {
+        auto value = fut->get();
+    }
 
-    auto fut = pool.enqueue([](int v) { return v * 2; }, 21);
-    auto value = fut.get();
-
-    pool.wait_for_tasks();
+    pool.shutdown();
 }
 ```
+
+### Shutdown Semantics
+- `shutdown()` stops accepting new tasks, wakes workers, and waits for queued tasks to drain.
+- Submitting after shutdown returns `std::nullopt`.
+
+### Telemetry
+The pool tracks lightweight counters for:
+- tasks submitted/completed/rejected
+- current queue depth
+- worker count
+
+Use `ThreadPool::stats()` to snapshot counters for visibility and tuning.
 
 ## Repository Layout
 - `include/tp/` — public headers (API contracts and types).
 - `src/` — implementation (worker loop, queue integration, shutdown).
-- `tests/` — unit/integration tests (scaffolded).
-- `bench/` — benchmark drivers (scaffolded).
-- `examples/` — usage examples (in progress).
+- `tests/` — sanity tests for queue + thread pool behavior.
+- `bench/` — throughput/latency benchmarks.
+- `examples/` — usage examples.
 
-## Building (Scaffold)
-The CMake setup is currently a placeholder and will be finalized alongside the core implementation. Build guidance will be updated in M1.
+## Building
+```bash
+cmake -S . -B build
+cmake --build build -j
+```
+
+## Benchmarks
+```bash
+./build/bench_throughput 20000 5000 4
+./build/bench_latency 10000 2000 4
+```
+
+### Sample Results (Feb 6, 2026)
+Results depend on hardware and load. These are sample numbers from the dev machine:
+- Throughput: thread pool ~157k tasks/sec vs. `std::async` ~26.7k tasks/sec (**~5.9× faster**).
+- Latency (us): thread pool avg ~35.2k, p50 ~36.7k, p95 ~59.4k, p99 ~60.2k.
+- Latency (us): `std::async` avg ~189.8k, p50 ~189.7k, p95 ~293.1k, p99 ~301.7k.
 
 ## Roadmap
 High-level milestones and timelines live in `ROADMAP.md`, with detailed, prioritized tasks in `TASKS.md`.
