@@ -42,9 +42,14 @@ void ThreadPool::shutdown() {
 
     const auto current_id = std::this_thread::get_id();
     for (auto& worker : impl_->workers) {
-        if (worker.joinable() && worker.get_id() != current_id) {
-            worker.join();
+        if (!worker.joinable()) {
+            continue;
         }
+        if (worker.get_id() == current_id) {
+            worker.detach();
+            continue;
+        }
+        worker.join();
     }
 }
 

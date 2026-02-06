@@ -31,9 +31,11 @@ int main() {
             return local;
         });
 
-        if (fut_opt.has_value()) {
-            futures.push_back(std::move(*fut_opt));
+        if (!fut_opt.has_value()) {
+            std::cerr << "submit failed for chunk " << c << "\n";
+            return 1;
         }
+        futures.push_back(std::move(*fut_opt));
     }
 
     long long total = 0;

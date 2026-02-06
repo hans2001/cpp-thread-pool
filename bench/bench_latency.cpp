@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstddef>
 #include <future>
@@ -57,23 +58,27 @@ std::vector<double> run_pool(const BenchConfig& cfg) {
     tp::ThreadPool pool(cfg.workers);
     std::vector<std::future<void>> futures;
     std::vector<std::chrono::high_resolution_clock::time_point> starts;
+    std::vector<std::chrono::high_resolution_clock::time_point> ends(cfg.tasks);
     futures.reserve(cfg.tasks);
     starts.reserve(cfg.tasks);
 
     for (size_t i = 0; i < cfg.tasks; ++i) {
         starts.push_back(std::chrono::high_resolution_clock::now());
-        auto fut_opt = pool.submit([iters = cfg.work_iters]() { busy_work(iters); });
-        if (fut_opt.has_value()) {
-            futures.push_back(std::move(*fut_opt));
-        }
+        auto fut_opt = pool.submit([iters = cfg.work_iters, &ends, i]() {
+            busy_work(iters);
+            ends[i] = std::chrono::high_resolution_clock::now();
+        });
+        assert(fut_opt.has_value());
+        futures.push_back(std::move(*fut_opt));
     }
 
     std::vector<double> lat_us;
     lat_us.reserve(futures.size());
-    for (size_t i = 0; i < futures.size(); ++i) {
-        futures[i].get();
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::micro> dur = end - starts[i];
+    for (auto& fut : futures) {
+        fut.get();
+    }
+    for (size_t i = 0; i < cfg.tasks; ++i) {
+        std::chrono::duration<double, std::micro> dur = ends[i] - starts[i];
         lat_us.push_back(dur.count());
     }
 
@@ -84,22 +89,25 @@ std::vector<double> run_pool(const BenchConfig& cfg) {
 std::vector<double> run_async(const BenchConfig& cfg) {
     std::vector<std::future<void>> futures;
     std::vector<std::chrono::high_resolution_clock::time_point> starts;
+    std::vector<std::chrono::high_resolution_clock::time_point> ends(cfg.tasks);
     futures.reserve(cfg.tasks);
     starts.reserve(cfg.tasks);
 
     for (size_t i = 0; i < cfg.tasks; ++i) {
         starts.push_back(std::chrono::high_resolution_clock::now());
-        futures.push_back(std::async(std::launch::async, [iters = cfg.work_iters]() {
+        futures.push_back(std::async(std::launch::async, [iters = cfg.work_iters, &ends, i]() {
             busy_work(iters);
+            ends[i] = std::chrono::high_resolution_clock::now();
         }));
     }
 
     std::vector<double> lat_us;
     lat_us.reserve(futures.size());
-    for (size_t i = 0; i < futures.size(); ++i) {
-        futures[i].get();
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::micro> dur = end - starts[i];
+    for (auto& fut : futures) {
+        fut.get();
+    }
+    for (size_t i = 0; i < cfg.tasks; ++i) {
+        std::chrono::duration<double, std::micro> dur = ends[i] - starts[i];
         lat_us.push_back(dur.count());
     }
 
