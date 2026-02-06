@@ -1,5 +1,6 @@
 # Project-local files
 LOCAL_STUDY_PLAN.md
+<<<<<<< HEAD
 
 # Build artifacts
 build/
@@ -49,3 +50,8 @@ compile_commands.json
 # OS files
 .DS_Store
 Thumbs.db
+=======
+build/
+build-asan/
+build-tsan/
+>>>>>>> main
