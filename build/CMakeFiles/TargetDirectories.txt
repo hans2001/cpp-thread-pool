@@ -1,3 +1,0 @@
-/mnt/c/Users/hans2/repo/cpp-thread-pool/build/CMakeFiles/test_basic.dir
-/mnt/c/Users/hans2/repo/cpp-thread-pool/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/hans2/repo/cpp-thread-pool/build/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,4 @@
 LOCAL_STUDY_PLAN.md
+build/
+build-asan/
+build-tsan/

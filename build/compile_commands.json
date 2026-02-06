@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/mnt/c/Users/hans2/repo/cpp-thread-pool/build",
-  "command": "/usr/bin/c++  -I/mnt/c/Users/hans2/repo/cpp-thread-pool/include -g -std=c++20 -o CMakeFiles/test_basic.dir/tests/test_basic.cpp.o -c /mnt/c/Users/hans2/repo/cpp-thread-pool/tests/test_basic.cpp",
-  "file": "/mnt/c/Users/hans2/repo/cpp-thread-pool/tests/test_basic.cpp",
-  "output": "CMakeFiles/test_basic.dir/tests/test_basic.cpp.o"
-}
-]
