@@ -45,4 +45,3 @@ Use this as the source of truth for per-milestone work. Check items as they land
 - [x] [P1] Add design notes in `docs/` if needed.
 - [x] [P1] Add study guide and interview Q&A.
 - [ ] [P1] Add a release checklist (targets, compilers, platforms).
-- [ ] [P1] Add a release checklist (targets, compilers, platforms).

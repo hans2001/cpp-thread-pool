@@ -64,10 +64,10 @@ public:
     }
 
 private:
-    std::mutex mtx_;
+    mutable std::mutex mtx_;
     std::condition_variable cv_;
     std::deque<T> queue_;
     bool closed_ = false;
 };
 
-}  // namespace tp
+}  

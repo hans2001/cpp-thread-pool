@@ -1,4 +1,53 @@
+# Project-local files
 LOCAL_STUDY_PLAN.md
+
+# Build artifacts
 build/
 build-asan/
 build-tsan/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# Object files, libraries, and binaries
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Debug and profiler outputs
+*.dSYM/
+*.dSYM.zip
+*.dmp
+*.pdb
+*.profraw
+*.profdata
+*.gcda
+*.gcno
+*.gcov
+*.gmon
+*.perf
+
+# IDE/editor and tooling
+.idea/
+.vscode/
+.vs/
+.clangd/
+.cache/
+.ccls-cache/
+.clang-tidy/
+
+# OS files
+.DS_Store
+Thumbs.db
