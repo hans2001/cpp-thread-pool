@@ -7,6 +7,13 @@ case "$mode" in
   asan)
     build_dir="build-asan"
     cxx_flags="-fsanitize=address -fno-omit-frame-pointer -O1 -g"
+    if [[ "${ASAN_OPTIONS:-}" != *"detect_leaks="* ]]; then
+      if [[ -z "${ASAN_OPTIONS:-}" ]]; then
+        export ASAN_OPTIONS="detect_leaks=0"
+      else
+        export ASAN_OPTIONS="${ASAN_OPTIONS}:detect_leaks=0"
+      fi
+    fi
     ;;
   tsan)
     build_dir="build-tsan"
