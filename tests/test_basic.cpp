@@ -5,6 +5,7 @@
 
 #include "tp/blocking_queue.hpp"
 
+/// Validates BlockingQueue push/pop/try_pop and close wake behavior.
 int main() {
     tp::BlockingQueue<int> queue;
 

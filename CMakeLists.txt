@@ -18,6 +18,9 @@ target_link_libraries(test_future PRIVATE tp)
 add_executable(test_shutdown tests/test_shutdown.cpp)
 target_link_libraries(test_shutdown PRIVATE tp)
 
+add_executable(test_stress tests/test_stress.cpp)
+target_link_libraries(test_stress PRIVATE tp)
+
 add_executable(example_hello examples/hello.cpp)
 target_link_libraries(example_hello PRIVATE tp)
 

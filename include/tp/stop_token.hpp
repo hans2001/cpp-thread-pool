@@ -9,7 +9,7 @@ namespace detail {
 struct StopState {
     std::atomic<bool> requested{false};
 };
-}  // namespace detail
+}
 
 /// A lightweight observer that lets tasks or helpers detect when shutdown has been triggered.
 /// The token is copyable/movable and watches the shared stop state owned by a `StopSource`.
@@ -62,4 +62,4 @@ private:
     std::shared_ptr<detail::StopState> state_;
 };
 
-}  // namespace tp
+}

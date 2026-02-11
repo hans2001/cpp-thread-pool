@@ -4,6 +4,7 @@
 
 #include "tp/thread_pool.hpp"
 
+/// Validates futures returned from submit and rejection after shutdown.
 int main() {
     tp::ThreadPool pool(2);
 

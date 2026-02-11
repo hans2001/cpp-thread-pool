@@ -77,4 +77,4 @@ ThreadPool::Stats ThreadPool::stats() const noexcept {
     return snapshot;
 }
 
-}  // namespace tp
+}

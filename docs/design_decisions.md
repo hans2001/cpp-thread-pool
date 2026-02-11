@@ -72,6 +72,24 @@
 **Tradeoff:** Doesn’t capture all real‑world behaviors.  
 **Benefit:** Clear baseline for performance validation.
 
+### 13) Exceptions Stay in Futures
+**Choice:** Let task exceptions propagate through `std::future::get()`.  
+**Why:** It matches standard C++ async patterns and keeps workers stable.  
+**Tradeoff:** Callers must remember to `get()` and handle exceptions.  
+**Benefit:** Clear, standard error propagation without crashing worker threads.
+
+### 14) Fixed Worker Count
+**Choice:** Create a fixed number of workers on construction.  
+**Why:** Stable resource usage and predictable throughput.  
+**Tradeoff:** No dynamic resizing under load.  
+**Benefit:** Simpler mental model and easier benchmarking.
+
+### 15) Stop Token Is Optional, Not Enforced
+**Choice:** Provide a stop token but do not force tasks to check it.  
+**Why:** Tasks may be non‑interruptible or have their own stop logic.  
+**Tradeoff:** Tasks can run to completion even during shutdown.  
+**Benefit:** Keeps the core pool simple and avoids surprising behavior.
+
 ### Risks & Mitigations
 - **Risk:** Single shared queue becomes a bottleneck under heavy contention.  
   **Mitigation:** Add per‑worker queues + work‑stealing (planned M2).
@@ -81,3 +99,5 @@
   **Mitigation:** Keep counters lightweight and optional for release builds.
 - **Risk:** Synthetic benchmarks don’t represent production workloads.  
   **Mitigation:** Add workload‑specific benchmarks once real usage is known.
+- **Risk:** Callers ignore futures and miss exceptions.  
+  **Mitigation:** Document usage; add optional logging for unobserved failures.

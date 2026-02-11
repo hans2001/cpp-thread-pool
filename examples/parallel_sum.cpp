@@ -5,6 +5,7 @@
 
 #include "tp/thread_pool.hpp"
 
+/// Parallel sum using chunked tasks and futures.
 int main() {
     const size_t size = 1'000'000;
     const size_t workers = 4;

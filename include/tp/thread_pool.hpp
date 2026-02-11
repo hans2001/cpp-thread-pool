@@ -76,6 +76,7 @@ template <typename Callable, typename... Args>
 auto ThreadPool::submit(Callable&& callable, Args&&... args)
     -> std::optional<std::future<std::invoke_result_t<Callable, Args...>>> {
     using Result = std::invoke_result_t<Callable, Args...>;
+
     if (!impl_ || impl_->shutdown.load(std::memory_order_acquire)) {
         if (impl_) {
             impl_->rejected.fetch_add(1, std::memory_order_relaxed);
@@ -101,4 +102,4 @@ auto ThreadPool::submit(Callable&& callable, Args&&... args)
     return future;
 }
 
-}  // namespace tp
+}

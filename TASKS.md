@@ -33,8 +33,8 @@ Use this as the source of truth for per-milestone work. Check items as they land
 
 ## M4: Tests + Benchmarks
 - [ ] [P0] Choose a test framework and wire it into CMake.
-- [ ] [P0] Implement unit tests for queue, stop token, thread pool.
-- [ ] [P1] Implement stress tests for enqueue/drain/shutdown.
+- [x] [P0] Implement unit tests for queue, stop token, thread pool.
+- [x] [P1] Implement stress tests for enqueue/drain/shutdown.
 - [x] [P1] Fill in latency and throughput benchmarks with stable configs.
 - [x] [P1] Add assert-based sanity tests for queue and thread pool basics.
 - [x] [P2] Add sanitizer build/run helper script.
@@ -44,4 +44,4 @@ Use this as the source of truth for per-milestone work. Check items as they land
 - [x] [P0] Update `README.md` with usage examples and guarantees.
 - [x] [P1] Add design notes in `docs/` if needed.
 - [x] [P1] Add study guide and interview Q&A.
-- [ ] [P1] Add a release checklist (targets, compilers, platforms).
+- [x] [P1] Add a release checklist (targets, compilers, platforms).

@@ -6,6 +6,7 @@
 
 #include "tp/thread_pool.hpp"
 
+/// Validates shutdown drains queued tasks and joins workers.
 int main() {
     tp::ThreadPool pool(4);
 

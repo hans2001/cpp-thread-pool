@@ -2,6 +2,7 @@
 
 #include "tp/thread_pool.hpp"
 
+/// Minimal usage: submit a task, read result, print stats.
 int main() {
     tp::ThreadPool pool(2);
 

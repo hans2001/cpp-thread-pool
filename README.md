@@ -66,7 +66,7 @@ Use `ThreadPool::stats()` to snapshot counters for visibility and tuning.
 - `src/` — implementation (worker loop, queue integration, shutdown).
 - `tests/` — sanity tests for queue + thread pool behavior.
 - `bench/` — throughput/latency benchmarks.
-- `examples/` — usage examples.
+- `examples/` — usage examples (`hello.cpp`, `parallel_sum.cpp`).
 
 ## Building
 ```bash
@@ -80,11 +80,11 @@ cmake --build build -j
 ./build/bench_latency 10000 2000 4
 ```
 
-### Sample Results (Feb 6, 2026)
+### Sample Results (Feb 11, 2026)
 Results depend on hardware and load. These are sample numbers from the dev machine:
-- Throughput: thread pool ~157k tasks/sec vs. `std::async` ~26.7k tasks/sec (**~5.9× faster**).
-- Latency (us): thread pool avg ~35.2k, p50 ~36.7k, p95 ~59.4k, p99 ~60.2k.
-- Latency (us): `std::async` avg ~189.8k, p50 ~189.7k, p95 ~293.1k, p99 ~301.7k.
+- Throughput: thread pool ~524k tasks/sec vs. `std::async` ~24.3k tasks/sec (**~21.5× faster**).
+- Latency (us): thread pool avg ~19.1, p50 ~18.2, p95 ~64.6, p99 ~119.7.
+- Latency (us): `std::async` avg ~43.9, p50 ~41.4, p95 ~54.5, p99 ~98.7.
 
 ## Roadmap
 High-level milestones and timelines live in `ROADMAP.md`, with detailed, prioritized tasks in `TASKS.md`.
